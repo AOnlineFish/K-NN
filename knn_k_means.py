@@ -8,7 +8,7 @@ ______________________________
 Software: PyCharm
 ______________________________
 """
-import pandas as pd`
+import pandas as pd
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.cluster import KMeans
 from sklearn.impute import SimpleImputer
@@ -78,4 +78,4 @@ def k_means(data_csv, output_csv):
 
 
 if __name__ == '__main__':
-    k_means("人员信息数据集.csv", "人员信息_cluster.csv")
+    k_means('data/人员信息数据集.csv', 'data/人员信息_cluster.csv')
