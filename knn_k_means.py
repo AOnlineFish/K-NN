@@ -10,11 +10,11 @@ ______________________________
 """
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.cluster import KMeans
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.impute import SimpleImputer
 
 
-def k_means(data_csv, output_csv):
+def knn(data_csv, output_csv):
     # Load the dataset from a CSV file 李思莹：这里的data_csv是什么？是从哪里来的？
     file_path = data_csv
 
@@ -60,22 +60,46 @@ def k_means(data_csv, output_csv):
 
     # Add the scaled numerical features back to the dataframe
     data[['工作年限_scaled', '基本工资_scaled', '年薪_scaled']] = scaled_numerical_features
+    data['平均月薪'] = data['年薪'] / 12
+    data['经验'] = data['工龄']
 
     # Use only the encoded and scaled features for clustering
     features_for_clustering = data[
         ['学历_encoded', '工作年限_scaled', '2020绩效_encoded', '2021绩效_encoded', '2022绩效_encoded',
          '基本工资_scaled', '年薪_scaled']]
 
-    # Perform KMeans clustering
-    kmeans = KMeans(n_clusters=3, n_init=10, random_state=0)
-    data['cluster_label'] = kmeans.fit_predict(features_for_clustering)
+    # Perform KNN classification
+    knn = KNeighborsClassifier(n_neighbors=3)
+    # knn.fit(features_for_clustering, data['是否离职'])
+    #
+    # # Predict the target variable
+    # data['是否离职_predicted'] = knn.predict(features_for_clustering)
 
-    # Save the data with cluster labels to a new CSV file
+    # Save the data with predicted target variable to a new CSV file
     output_file_path = output_csv
     data.to_csv(output_file_path, index=False, encoding='GBK')
 
-    print('Clustering complete. Output saved to:', output_file_path)
+    print('KNN classification complete. Output saved to:', output_file_path)
+
+
+def predict_data(data, output_csv):
+    file_path = data
+
+    data = pd.read_csv(file_path, encoding='GBK')
+
+    le_education = LabelEncoder()
+    le_performance = LabelEncoder()
+
+    data['学历_encoded'] = le_education.fit_transform(data['学历'])
+
+
+    output_file_path = output_csv
+    data.to_csv(output_file_path, index=False, encoding='GBK')
+
+    print('KNN classification complete. Output saved to:', output_file_path)
 
 
 if __name__ == '__main__':
-    k_means('data/人员信息数据集.csv', 'data/人员信息_cluster.csv')
+    knn('data/人员信息数据集.csv', 'data/人员信息_knn.csv')
+    predict_data('data/人力资源专员.csv', 'data/人力资源专员_knn.csv')
+    predict_data('data/销售总监.csv', 'data/销售总监_knn.csv')
